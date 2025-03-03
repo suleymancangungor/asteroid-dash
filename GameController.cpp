@@ -40,14 +40,14 @@ void GameController::play(const string &commands_file) {
             } else {
                 cout << "Unknown command: " << line << endl;
             }
-            game->game_time++;
-            game->current_score++;
             game->update_space_grid();
         }
         game->print_space_grid();
         if (game->game_over){
             break;
         }
+        game->game_time++;
+        game->current_score++;
     }
     if (!(game->game_over)){
         cout << "GAME FINISHED! No more commands!" << endl;

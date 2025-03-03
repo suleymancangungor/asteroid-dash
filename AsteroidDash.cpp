@@ -100,8 +100,8 @@ void AsteroidDash::read_celestial_objects(const string &input_file) {
                 type = AMMO;
             } else if (effect == "life"){
                 type = LIFE_UP;
-                create = true;
             }
+            create = true;
         } else {
             if (line.find('[') != string::npos){
                 type = ASTEROID;
@@ -190,8 +190,6 @@ void AsteroidDash::update_space_grid() {
         }
     }
 
-    move_bullets();
-
     //Update celestial objects
     CelestialObject* current = celestial_objects_list_head;
     while (current != nullptr){
@@ -201,9 +199,13 @@ void AsteroidDash::update_space_grid() {
         }
         current = next;
     }
+    
+    move_bullets();
 
-    //Delete bullets that are out of bounds or have hit an asteroid
-    delete_bullet();
+    //Delete bullets that are out of bounds
+    delete_bullet_oog();
+
+    //cout << "Bullet count: " << bullets.size() << endl; // Debugging
 
     //Draw bullets
     for (Bullet* bullet : bullets){
@@ -273,8 +275,8 @@ bool AsteroidDash::handle_collision(CelestialObject* celestial, int row, int col
     }
 
     for (Bullet* bullet : bullets){
-        if (bullet->row == row && bullet->col == col && celestial->object_type == ASTEROID){
-            bullet->is_hit = true;
+        if (celestial->object_type == ASTEROID && bullet->row == row && (bullet->col == col-1 || bullet->col == col)){
+            delete_bullet_hit(bullet);
             current_score += 10;
             celestial->occupied_cells--;
             if (celestial->occupied_cells == 0){
@@ -380,10 +382,20 @@ void AsteroidDash::delete_celestial(CelestialObject* celestial){
     }
 }
 
-void AsteroidDash::delete_bullet(){
+void AsteroidDash::delete_bullet_hit(Bullet* bullet_to_delete) {
+    for (auto it = bullets.begin(); it != bullets.end(); ++it) {
+        if (*it == bullet_to_delete) {
+            delete *it;
+            bullets.erase(it);
+            return;
+        }
+    }
+}
+
+void AsteroidDash::delete_bullet_oog(){
     for (int i = bullets.size()-1; i >= 0; i--){
         Bullet* bullet = bullets[i];
-        if (bullet->is_hit || bullet->out_of_bound){
+        if (bullet->out_of_bound){
             bullets.erase(bullets.begin() + i);
             delete bullet;
         }

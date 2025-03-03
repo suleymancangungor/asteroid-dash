@@ -22,7 +22,6 @@ using namespace std;
 struct Bullet{
     int row = 0;
     int col = 0;
-    bool is_hit = false;
     bool out_of_bound = false;
     
     Bullet(int row, int col) : row(row), col(col) {}
@@ -86,7 +85,7 @@ public:
     // Updates the grid based on player and celestial object states
     void update_space_grid();
 
-    // Corresponds to the SHOOT command.
+    // Corresponds to the SHOOT command
     void shoot();
 
     int read_celestial_shape(vector<vector<bool>> &celestial_shape, string line);
@@ -101,7 +100,11 @@ public:
 
     void delete_celestial(CelestialObject* celestial);
 
-    void delete_bullet();
+    // Deletes bullet that's hit an asteroid
+    void delete_bullet_hit(Bullet* bullet_to_delete);
+
+    // Delete bullets that are out of bounds
+    void delete_bullet_oog();
 
     int control_celestial(CelestialObject* celestial);
 
