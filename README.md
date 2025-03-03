@@ -23,7 +23,7 @@ In **Asteroid Dash**, the gameplay unfolds on a dynamic grid where:
 
 To compile the project, use the following command. (Note: our test files will be used in place of `main.cpp`.)
 
-bash
+```bash```
 $ g++ -std=c++11 -g main.cpp AsteroidDash.h AsteroidDash.cpp CelestialObject.h CelestialObject.cpp GameController.h GameController.cpp LeaderboardEntry.h LeaderboardEntry.cpp Leaderboard.h Leaderboard.cpp Player.h Player.cpp -o AsteroidDash
 
 ### Execution
