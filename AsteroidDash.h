@@ -112,7 +112,7 @@ public:
 
     void connect_prev_links(CelestialObject* celestial);
 
-    void connect_new_prev_links(CelestialObject* celestial);
+    void connect_new_prev_links(CelestialObject* celestial, string direction);
 };
 
 

@@ -57,7 +57,6 @@ void Leaderboard::print_leaderboard() {
 //  is maintained, and the leaderboard size does not exceed 10 entries at any given time (only the
 //  top 10 all-time high-scores should be kept in descending order by the score).
 void Leaderboard::insert(LeaderboardEntry *new_entry) {
-    //cout << "Inserting " << new_entry->player_name << " with score " << new_entry->score << endl; // Debugging
     if (head_leaderboard_entry == nullptr){
         head_leaderboard_entry = new_entry;
         return;
@@ -75,7 +74,6 @@ void Leaderboard::insert(LeaderboardEntry *new_entry) {
         prev->next = new_entry;
         new_entry->next = current;
     }
-    //cout << "Inserted " << new_entry->player_name << " with score " << new_entry->score << endl; // Debugging
 
     // Remove the last entry if the leaderboard size exceeds 10
     LeaderboardEntry* last = head_leaderboard_entry;
@@ -89,7 +87,6 @@ void Leaderboard::insert(LeaderboardEntry *new_entry) {
         last->next = nullptr;
         delete delete_entry;
     }
-    //cout << "Leaderboard size: " << count << endl; // Debugging
 }
 
 // Free dynamically allocated memory used for storing leaderboard entries

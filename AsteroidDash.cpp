@@ -199,13 +199,11 @@ void AsteroidDash::update_space_grid() {
         }
         current = next;
     }
-    
+
     move_bullets();
 
     //Delete bullets that are out of bounds
     delete_bullet_oog();
-
-    //cout << "Bullet count: " << bullets.size() << endl; // Debugging
 
     //Draw bullets
     for (Bullet* bullet : bullets){
@@ -284,14 +282,26 @@ bool AsteroidDash::handle_collision(CelestialObject* celestial, int row, int col
                 delete_celestial(celestial);
                 return true;
             }
+            string direction;
+            if (celestial->shape.size() % 2 == 1) {
+                int middle = celestial->shape.size() / 2;
+                if (celestial_row == middle){
+                    direction = "middle";
+                } else if (celestial_row < middle) {
+                    direction = "right";
+                } else {
+                    direction = "left";
+                }
+            } else {
+                direction = (celestial_row <= celestial->shape.size() / 2) ? "right" : "left";
+            }
             celestial->update_celestial(celestial_row, celestial_col);
             celestial->connect_next_links();
-            connect_new_prev_links(celestial);
+            connect_new_prev_links(celestial, direction);
             return false;
         }
     }
 
-    //cout << "row:" << row << " " << "col:" << col << " " << "player row:" << player->position_row << " " << "player last row:" << player->position_row + player->spacecraft_shape.size() -1 << " " << "player col:" << player->position_col << " " << "player last col:" << player->position_col + player->spacecraft_shape[0].size() -1 << endl; // Debugging
     if (row >= player->position_row && row <= player->position_row + player->spacecraft_shape.size() -1 && col >= player->position_col && col <= player->position_col + player->spacecraft_shape[0].size() -1 && player->spacecraft_shape[row - player->position_row][col - player->position_col]){
         if (celestial->object_type == AMMO){
             if (player->current_ammo < player->max_ammo){
@@ -321,7 +331,6 @@ bool AsteroidDash::update_celestial_pos(CelestialObject* celestial){
         for (int i = celestial->starting_row; i < celestial->starting_row + celestial->shape.size(); i++){
             for (int j = space_grid[0].size()-1-col; j < space_grid[0].size()-1-col+celestial->shape[0].size(); j++){
                 if (i>=0 && i < space_grid.size() && j >= 0 && j < space_grid[i].size()){
-                    //cout << "space_grid i:" << i << " space_grid j:" << j << " celestial i:" << i - celestial->starting_row << " celestial j:" << j - (space_grid[0].size()-1-col) << endl; // Debugging
                     if (celestial->shape[i - celestial->starting_row][j - (space_grid[0].size()-1-col)] && handle_collision(celestial, i, j, i - celestial->starting_row, j - (space_grid[0].size()-1-col))){
                         return false;
                     }
@@ -438,7 +447,7 @@ void AsteroidDash::connect_prev_links(CelestialObject* celestial){
     }
 }
 
-void AsteroidDash::connect_new_prev_links(CelestialObject* celestial){
+void AsteroidDash::connect_new_prev_links(CelestialObject* celestial, string direction){
     CelestialObject* current = celestial_objects_list_head;
     CelestialObject* prev = nullptr;
     while (current != nullptr && current != celestial){
@@ -447,24 +456,48 @@ void AsteroidDash::connect_new_prev_links(CelestialObject* celestial){
     }
 
     if (current != nullptr && prev != nullptr){
-        if (celestial->right_rotation != nullptr) {
-            CelestialObject* right = prev->right_rotation;
-            while (right != nullptr && right != current){
-                right->next_celestial_object = celestial->right_rotation;
-                right = right->right_rotation;
+        if (direction == "right") {
+            if (celestial->right_rotation != nullptr) {
+                CelestialObject* right = prev->right_rotation;
+                while (right != nullptr && right != current){
+                    right->next_celestial_object = celestial->right_rotation;
+                    right = right->right_rotation;
+                }
+                prev->next_celestial_object = celestial->right_rotation;
+            } else {
+                CelestialObject* right = prev->right_rotation;
+                while (right != nullptr && right != current){
+                    right->next_celestial_object = celestial;
+                    right = right->right_rotation;
+                }
+                prev->next_celestial_object = celestial;
             }
-            prev->next_celestial_object = celestial->right_rotation;
-        } else {
-            CelestialObject* right = prev->right_rotation;
-            while (right != nullptr && right != current){
-                right->next_celestial_object = celestial;
-                right = right->right_rotation;
+        } else if (direction == "left") {
+            if (celestial->left_rotation != nullptr) {
+                CelestialObject* left = prev->left_rotation;
+                while (left != nullptr && left != current){
+                    left->next_celestial_object = celestial->left_rotation;
+                    left = left->left_rotation;
+                }
+                prev->next_celestial_object = celestial->left_rotation;
+            } else {
+                CelestialObject* left = prev->left_rotation;
+                while (left != nullptr && left != current){
+                    left->next_celestial_object = celestial;
+                    left = left->left_rotation;
+                }
+                prev->next_celestial_object = celestial;
             }
-            prev->next_celestial_object = celestial;
+        } else if (direction == "middle") {
+            connect_prev_links(celestial);
         }
     } else if (prev == nullptr) {
         if (celestial->right_rotation != nullptr) {
-            celestial_objects_list_head = celestial->right_rotation;
+            if (direction == "right") {
+                celestial_objects_list_head = celestial->right_rotation;
+            } else if (direction == "left") {
+                celestial_objects_list_head = celestial->left_rotation;
+            }
         }
     }
 }
