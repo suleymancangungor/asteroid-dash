@@ -316,10 +316,10 @@ bool AsteroidDash::update_celestial_pos(CelestialObject* celestial){
         return false;
     }
     if (col >= 0){
-        for (int i = celestial->starting_row; i < celestial->starting_row + celestial->shape.size() -1; i++){
-            for (int j = space_grid[0].size()-1-col; j < space_grid[0].size()-1-col+celestial->shape[0].size()-1; j++){
+        for (int i = celestial->starting_row; i < celestial->starting_row + celestial->shape.size(); i++){
+            for (int j = space_grid[0].size()-1-col; j < space_grid[0].size()-1-col+celestial->shape[0].size(); j++){
                 if (i>=0 && i < space_grid.size() && j >= 0 && j < space_grid[i].size()){
-                    //cout << "i:" << i << "j:" << j << endl; // Debugging
+                    //cout << "space_grid i:" << i << " space_grid j:" << j << " celestial i:" << i - celestial->starting_row << " celestial j:" << j - (space_grid[0].size()-1-col) << endl; // Debugging
                     if (celestial->shape[i - celestial->starting_row][j - (space_grid[0].size()-1-col)] && handle_collision(celestial, i, j, i - celestial->starting_row, j - (space_grid[0].size()-1-col))){
                         return false;
                     }
