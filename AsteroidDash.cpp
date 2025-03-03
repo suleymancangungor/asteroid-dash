@@ -135,6 +135,13 @@ void AsteroidDash::read_celestial_objects(const string &input_file) {
             type = NONE;
         }
     }
+    // Connecting links
+    CelestialObject* current = celestial_objects_list_head;
+    while (current != nullptr){
+        connect_prev_links(current);
+        current->connect_next_links();
+        current = current->next_celestial_object;
+    }
 }
 
 
@@ -276,31 +283,8 @@ bool AsteroidDash::handle_collision(CelestialObject* celestial, int row, int col
                 return true;
             }
             celestial->update_celestial(celestial_row, celestial_col);
-            celestial->connect_rotations();
-            CelestialObject* current = celestial_objects_list_head;
-            CelestialObject* prev = nullptr;
-            while (current != nullptr && current != celestial){
-                prev = current;
-                current = current->next_celestial_object;
-            }
-            if (prev != nullptr){
-                // previous celestial object is connected to updated celestial object
-                if (celestial->right_rotation != nullptr) {
-                    CelestialObject* right = prev->right_rotation;
-                    while (right != nullptr && right != current){
-                        right->next_celestial_object = celestial->right_rotation;
-                        right = right->right_rotation;
-                    }
-                    prev->next_celestial_object = celestial->right_rotation;
-                } else {
-                    CelestialObject* right = prev->right_rotation;
-                    while (right != nullptr && right != current){
-                        right->next_celestial_object = celestial;
-                        right = right->right_rotation;
-                    }
-                    prev->next_celestial_object = celestial;
-                }
-            }
+            celestial->connect_next_links();
+            connect_new_prev_links(celestial);
             return false;
         }
     }
@@ -421,5 +405,54 @@ int AsteroidDash::control_celestial(CelestialObject* celestial){
 void AsteroidDash::move_bullets(){
     for (int i = 0; i < bullets.size(); i++){
         bullets[i]->move(space_grid[0].size()-1);
+    }
+}
+
+void AsteroidDash::connect_prev_links(CelestialObject* celestial){
+    CelestialObject* current = celestial_objects_list_head;
+    CelestialObject* prev = nullptr;
+    while (current != nullptr && current != celestial){
+        prev = current;
+        current = current->next_celestial_object;
+    }
+
+    if (current != nullptr && prev != nullptr){
+        CelestialObject* right = prev->right_rotation;
+        while (right != nullptr && right != prev){
+            right->next_celestial_object = current;
+            right = right->right_rotation;
+        }
+        prev->next_celestial_object = celestial;
+    }
+}
+
+void AsteroidDash::connect_new_prev_links(CelestialObject* celestial){
+    CelestialObject* current = celestial_objects_list_head;
+    CelestialObject* prev = nullptr;
+    while (current != nullptr && current != celestial){
+        prev = current;
+        current = current->next_celestial_object;
+    }
+
+    if (current != nullptr && prev != nullptr){
+        if (celestial->right_rotation != nullptr) {
+            CelestialObject* right = prev->right_rotation;
+            while (right != nullptr && right != current){
+                right->next_celestial_object = celestial->right_rotation;
+                right = right->right_rotation;
+            }
+            prev->next_celestial_object = celestial->right_rotation;
+        } else {
+            CelestialObject* right = prev->right_rotation;
+            while (right != nullptr && right != current){
+                right->next_celestial_object = celestial;
+                right = right->right_rotation;
+            }
+            prev->next_celestial_object = celestial;
+        }
+    } else if (prev == nullptr) {
+        if (celestial->right_rotation != nullptr) {
+            celestial_objects_list_head = celestial->right_rotation;
+        }
     }
 }

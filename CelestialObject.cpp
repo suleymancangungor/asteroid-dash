@@ -5,7 +5,7 @@
 CelestialObject::CelestialObject(const vector<vector<bool>> &shape, ObjectType type, int start_row,
                                  int time_of_appearance)
         : shape(shape), object_type(type), starting_row(start_row), time_of_appearance(time_of_appearance) {
-    // TODO: Your code here
+    create_rotations();
 }
 
 
@@ -42,7 +42,8 @@ void CelestialObject::create_rotations(){
         if (rotated_shape == this->shape){
             break;
         }
-        CelestialObject* rotated = new CelestialObject(rotated_shape, this->object_type, this->starting_row, this->time_of_appearance);
+        CelestialObject* rotated = new CelestialObject(this);
+        rotated->shape = rotated_shape;
         current->right_rotation = rotated;
         rotated->left_rotation = current;
         current = rotated;
@@ -72,7 +73,7 @@ void CelestialObject::update_celestial(int i, int j){
 }
 
 
-void CelestialObject::connect_rotations(){
+void CelestialObject::connect_next_links(){
     if (this->next_celestial_object != nullptr){
         CelestialObject* right = this->right_rotation;
         while (right != nullptr && right != this){

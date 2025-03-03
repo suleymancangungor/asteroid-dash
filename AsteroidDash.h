@@ -106,6 +106,10 @@ public:
     int control_celestial(CelestialObject* celestial);
 
     void move_bullets();
+
+    void connect_prev_links(CelestialObject* celestial);
+
+    void connect_new_prev_links(CelestialObject* celestial);
 };
 
 

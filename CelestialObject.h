@@ -2,7 +2,7 @@
 #define CELESTIALOBJECT_H
 
 #include <vector>
-
+#include <iostream> // For debugging
 using namespace std;
 
 // Enum to represent the type of the object (asteroid, life-up, or ammo)
@@ -57,7 +57,7 @@ public:
 
     void update_celestial(int i, int j);
 
-    void connect_rotations();
+    void connect_next_links();
 };
 
 #endif // CELESTIALOBJECT_H
